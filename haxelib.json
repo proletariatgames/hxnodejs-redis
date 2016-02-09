@@ -1,0 +1,14 @@
+{
+  "name": "hxnodejs-redis",
+  "url": "https://github.com/proletariatgames/hxnodejs-redis",
+  "license": "MIT",
+  "classPath": "src",
+  "tags": ["nodejs", "redis", "db"],
+  "description": "Externs for the request NPM module",
+  "releasenote": "Initial release",
+  "version": "2.4.2",
+  "contributors": ["Proletariat", "lpetre", "danogles", "waneck"],
+  "dependencies": {
+    "hxnodejs": ""
+  }
+}
