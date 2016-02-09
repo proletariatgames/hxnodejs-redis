@@ -1,5 +1,5 @@
 package js.npm;
-import js.npm.redis.Client;
+import js.npm.redis.RedisClient;
 import haxe.DynamicAccess;
 
 @:jsRequire("redis")
