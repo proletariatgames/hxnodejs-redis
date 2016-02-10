@@ -130,10 +130,12 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Multiple values in a hash can be set by supplying an object:
    **/
-  @:overload(function (name:String, obj:DynamicAccess<String>):TReturn {})
+  @:overload(function (name:String, obj:Dynamic<String>):TReturn {})
+  @:overload(function (name:String, obj:Dynamic<String>, callback:Null<js.Error>->Void):TReturn {})
   @:overload(function (name:String, values:Rest<String>):TReturn {})
   @:overload(function (name:String, values:Array<String>):TReturn {})
   @:overload(function (name:String, values:Array<String>, callback:Null<js.Error>->Void):TReturn {})
+  @:overload(function (name:String, key:String, value:String, callback:Null<js.Error>->Void):TReturn {})
   function hmset(name:String, obj:DynamicAccess<String>, callback:Null<js.Error>->Void):TReturn;
 
   /**
@@ -254,6 +256,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Delete one or more keys specified by names
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function del(keys:Rest<String>):TReturn;
 
   /**
@@ -314,6 +317,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Delete keys from hash name
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function hdel(name:String, keys:Rest<String>):TReturn;
 
   /**
@@ -350,6 +354,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Returns a list of values ordered identically to keys
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
   function hmget(name:String, keys:Rest<String>):TReturn;
 
   /**
@@ -439,7 +444,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Push values onto the head of the list name
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:String, values:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, value:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function lpush(name:String, values:Rest<String>):TReturn;
 
   /**
@@ -483,7 +488,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Returns a list of values ordered identically to keys
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (keys:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
   function mget(keys:Rest<String>):TReturn;
 
   /**
@@ -496,14 +501,14 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Sets each key in the mapping dict to its corresponding value
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->String->Void):TReturn {})
-  @:overload(function (mapping:String, callback:Null<js.Error>->String->Void):TReturn {})
+  @:overload(function (key:String, value:String, callback:Null<js.Error>->String->Void):TReturn {})
   function mset(mapping:Rest<String>):TReturn;
 
   /**
     Sets each key in the mapping dict to its corresponding value if none of the keys are already set
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (mapping:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (key:String, value:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function msetnx(mapping:Rest<String>):TReturn;
 
   // /**
@@ -570,7 +575,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Add value(s) to set name
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:String, values:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, value:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function sadd(name:String, values:Rest<String>):TReturn;
 
   /**
@@ -589,14 +594,14 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Return the difference of sets specified by keys
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (keys:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
   function sdiff(keys:Rest<String>):TReturn;
 
   /**
     Store the difference of sets specified by keys into a new set named dest. Returns the number of keys in the new set.
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (dest:String, keys:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (dest:String, key:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function sdiffstore(dest:String, keys:Rest<String>):TReturn;
 
   /**
@@ -643,7 +648,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Return the intersection of sets specified by keys
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (keys:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (key:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
   function sinter(keys:Rest<String>):TReturn;
 
   /**
@@ -761,111 +766,134 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   @:overload(function (name:String, callback:Null<js.Error>->String->Void):TReturn {})
   function type(name:String):TReturn;
 
-  // TODO
-  // /**
-  //   Set any number of score, element-name pairs to the key name. Pairs can be specified in two ways:
-  //
-  //   As *args, in the form of: score1, name1, score2, name2, ... or as **kwargs, in the form of: name1=score1,
-  //   name2=score2, ...
-  //
-  //   The following example would add four values to the ‘my-key’ key: redis.zadd(‘my-key’, 1.1, ‘name1’, 2.2, ‘name2’,
-  //   name3=3.3, name4=4.4)
-  //  **/
-  // function zadd(name:String, *args, **kwargs):TReturn;
-  //
-  // /**
-  //   Return the number of elements in the sorted set name
-  //  **/
-  // function zcard(name:String):TReturn;
-  //
-  // /**
-  //   Increment the score of value in sorted set name by amount
-  //  **/
-  // function zincrby(name:String, value, amount=1):TReturn;
-  //
+  /**
+    Set any number of score, element-name pairs to the key name
+   **/
+  @:overload(function (name:String, opt:ZAddOptions, score:Int, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, opt:ZAddOptions, score:Int, member:String):TReturn {})
+  @:overload(function (name:String, score:Int, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, score:Int, member:String, scoreMemebers:Rest<Dynamic>):TReturn {})
+  @:overload(function (args:Array<Dynamic>, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zadd(name:String, score:Int, member:String):TReturn;
+
+  /**
+    Return the number of elements in the sorted set name
+   **/
+  @:overload(function (name:String, callback:Null<js.Error>->Float->Void):TReturn {})
+  function zcard(name:String):TReturn;
+
+  /**
+    Increment the score of value in sorted set name by amount
+    Returns a String representing the floating point value of the new score of the member
+   **/
+  @:overload(function (name:String, value:Float, member:String, callback:Null<js.Error>->String->Void):TReturn {})
+  function zincrby(name:String, value:Float, member:String):TReturn;
+
   // /**
   //   Intersect multiple sorted sets specified by keys into a new sorted set, dest. Scores in the destination will be
   //   aggregated based on the aggregate, or SUM if none is provided.
   //  **/
-  // function zinterstore(dest, keys, aggregate=None):TReturn;
-  //
-  // /**
-  //   Return a range of values from sorted set name between start and end sorted in ascending order.
-  //
-  //   start and end can be negative, indicating the end of the range.
-  //
-  //   desc a boolean indicating whether to sort the results descendingly
-  //
-  //   withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
-  //
-  //   score_cast_func a callable used to cast the score return value
-  //  **/
-  // function zrange(name:String, start, end, desc=False, withscores=False, score_cast_func=<type 'float'>):TReturn;
-  //
-  // /**
-  //   Return a range of values from the sorted set name with scores between min and max.
-  //
-  //   If start and num are specified, then return a slice of the range.
-  //
-  //   withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
-  //
-  //   score_cast_func` a callable used to cast the score return value
-  //  **/
-  // function zrangebyscore(name:String, min, max, start=None, num=None, withscores=False, score_cast_func=<type 'float'>):TReturn;
-  //
-  // /**
-  //   Returns a 0-based value indicating the rank of value in sorted set name
-  //  **/
-  // function zrank(name:String, value):TReturn;
-  //
-  // /**
-  //   Remove member values from sorted set name
-  //  **/
-  // function zrem(name:String, *values):TReturn;
-  //
-  // /**
-  //   Remove all elements in the sorted set name with ranks between min and max. Values are 0-based, ordered from smallest
-  //   score to largest. Values can be negative indicating the highest scores. Returns the number of elements removed
-  //  **/
-  // function zremrangebyrank(name:String, min, max):TReturn;
-  //
-  // /**
-  //   Remove all elements in the sorted set name with scores between min and max. Returns the number of elements removed.
-  //  **/
-  // function zremrangebyscore(name:String, min, max):TReturn;
-  //
-  // /**
-  //   Return a range of values from sorted set name between start and num sorted in descending order.
-  //
-  //   start and num can be negative, indicating the end of the range.
-  //
-  //   withscores indicates to return the scores along with the values The return type is a list of (value, score) pairs
-  //
-  //   score_cast_func a callable used to cast the score return value
-  //  **/
-  // function zrevrange(name:String, start, num, withscores=False, score_cast_func=<type 'float'>):TReturn;
-  //
-  // /**
-  //   Return a range of values from the sorted set name with scores between min and max in descending order.
-  //
-  //   If start and num are specified, then return a slice of the range.
-  //
-  //   withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
-  //
-  //   score_cast_func a callable used to cast the score return value
-  //  **/
-  // function zrevrangebyscore(name:String, max, min, start=None, num=None, withscores=False, score_cast_func=<type 'float'>):TReturn;
-  //
-  // /**
-  //   Returns a 0-based value indicating the descending rank of value in sorted set name
-  //  **/
-  // function zrevrank(name:String, value):TReturn;
-  //
-  // /**
-  //   Return the score of element value in sorted set name
-  //  **/
-  // function zscore(name:String, value):TReturn;
-  //
+  // function zinterstore(dest:String, numkeys:Int, key, keys, aggregate=None):TReturn;
+
+  /**
+    Return a range of values from sorted set name between start and end sorted in ascending order.
+    start and end can be negative, indicating the end of the range.
+    desc a boolean indicating whether to sort the results descendingly
+    withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
+   **/
+  @:overload(function (name:String, start:Int, end:Int, withScores:ZWithScores,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, start:Int, end:Int, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, start:Int, end:Int, withScores:ZWithScores):TReturn {})
+  function zrange(name:String, start:Int, end:Int):TReturn;
+
+  /**
+    Return a range of values from the sorted set name with scores between min and max.
+    withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
+   **/
+  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int,
+        callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores):TReturn {})
+  function zrangebyscore(name:String, min:Float, max:Float):TReturn;
+
+  /**
+    Returns a 0-based value indicating the rank of key in sorted set name
+   **/
+  @:overload(function (name:String, key:String, callback:Null<js.Error>->Null<Int>->Void):TReturn {})
+  function zrank(name:String, key:String):TReturn;
+
+  /**
+    Remove member values from sorted set name
+   **/
+  @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, key:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zrem(name:String, keys:Rest<String>):TReturn;
+
+  /**
+    Remove all elements in the sorted set name with ranks between min and max. Values are 0-based, ordered from smallest
+    score to largest. Values can be negative indicating the highest scores. Returns the number of elements removed
+   **/
+  @:overload(function (name:String, min:Int, max:Int, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zremrangebyrank(name:String, min:Int, max:Int):TReturn;
+
+  /**
+    Remove all elements in the sorted set name with scores between min and max. Returns the number of elements removed.
+   **/
+  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zremrangebyscore(name:String, min:Float, max:Float):TReturn;
+
+  /**
+    Return a range of values from sorted set name between start and num sorted in descending order.
+    start and num can be negative, indicating the end of the range.
+    withscores indicates to return the scores along with the values The return type is a list of (value, score) pairs
+   **/
+  @:overload(function (name:String, start:Int, end:Int, withScores:ZWithScores,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, start:Int, end:Int, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, start:Int, end:Int, withScores:ZWithScores):TReturn {})
+  function zrevrange(name:String, start:Int, num:Int):TReturn;
+
+  /**
+    Return a range of values from the sorted set name with scores between min and max in descending order.
+
+    If start and num are specified, then return a slice of the range.
+
+    withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
+
+    score_cast_func a callable used to cast the score return value
+   **/
+  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int,
+        callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores,
+        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores):TReturn {})
+  function zrevrangebyscore(name:String, min:Float, max:Float):TReturn;
+
+  /**
+    Returns a 0-based value indicating the descending rank of key in sorted set name
+   **/
+  @:overload(function (name:String, key:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zrevrank(name:String, key:String):TReturn;
+
+  /**
+    Return the score of element key in sorted set name
+    Returns a string representing a Float
+   **/
+  @:overload(function (name:String, key:String, callback:Null<js.Error>->String->Void):TReturn {})
+  function zscore(name:String, key:String):TReturn;
+
   // /**
   //   Union multiple sorted sets specified by keys into a new sorted set, dest. Scores in the destination will be
   //   aggregated based on the aggregate, or SUM if none is provided.
@@ -888,13 +916,13 @@ extern class Multi extends RedisClientBase<Multi, Multi> {
     You can either chain together MULTI commands as in the above example, or you can queue individual commands while
     still sending regular client command as in this example:
    **/
-  @:overload(function(callback:Null<MultiError>->Array<String>->Void):Void {})
+  @:overload(function(callback:Null<MultiError>->Array<GenericRedisResponse>->Void):Void {})
   function exec():Void;
 
   /**
     Identical to Multi.exec but with the difference that executing a single command will not use transactions.
    **/
-  @:overload(function(callback:Null<MultiError>->Array<String>->Void):Void {})
+  @:overload(function(callback:Null<MultiError>->Array<GenericRedisResponse>->Void):Void {})
   function exec_atomic():Void;
 }
 
@@ -907,4 +935,72 @@ extern class MultiError extends js.Error {
   var After = "AFTER";
 }
 
-// abstract GenericRedisResponse
+abstract GenericRedisResponse(Dynamic)
+  from Dynamic
+  from Array<String> to Array<String>
+  from String to String
+  from Int to Int
+{
+  @:extern inline public function asArray():Array<String> {
+    if (Std.is(this, Array)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function asString():String {
+    if (Std.is(this, String)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function asInt():Null<Int> {
+    if (Std.is(this, Int)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+}
+
+@:enum abstract ZAddOptions(String) to String {
+  /**
+    Only update elements that already exist. Never add elements.
+   **/
+  var Xx = 'XX';
+
+  /**
+    Don't update already existing elements. Always add new elements.
+   **/
+  var Nx = 'NX';
+
+  /**
+    Modify the return value from the number of new elements added, to the total number of elements changed (CH is an
+    abbreviation of changed). Changed elements are new elements added and elements already existing for which the score
+    was updated. So elements specified in the command line having the same score as they had in the past are not
+    counted. Note: normally the return value of ZADD only counts the number of new elements added.
+   **/
+  var Ch = 'CH';
+
+  /**
+    When this option is specified ZADD acts like ZINCRBY. Only one score-element pair can be specified in this mode.
+   **/
+  var Incr = 'INCR';
+}
+
+@:enum abstract ZAggregate(String) to String {
+  var Sum = 'SUM';
+  var Min = 'MIN';
+  var Max = 'MAX';
+}
+
+@:enum abstract ZWithScores(String) to String {
+  var WithScores = 'WITHSCORES';
+}
+
+@:enum abstract ZLimit(String) to String {
+  var Limit = 'LIMIT';
+}
