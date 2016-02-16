@@ -769,25 +769,25 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Set any number of score, element-name pairs to the key name
    **/
-  @:overload(function (name:String, opt:ZAddOptions, score:Int, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:String, opt:ZAddOptions, score:Int, member:String):TReturn {})
-  @:overload(function (name:String, score:Int, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:String, score:Int, member:String, scoreMemebers:Rest<Dynamic>):TReturn {})
+  @:overload(function (name:String, opt:ZAddOptions, score:ZFloat, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, opt:ZAddOptions, score:ZFloat, member:String):TReturn {})
+  @:overload(function (name:String, score:ZFloat, member:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, score:ZFloat, member:String, scoreMemebers:Rest<Dynamic>):TReturn {})
   @:overload(function (args:Array<Dynamic>, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zadd(name:String, score:Int, member:String):TReturn;
+  function zadd(name:String, score:ZFloat, member:String):TReturn;
 
   /**
     Return the number of elements in the sorted set name
    **/
-  @:overload(function (name:String, callback:Null<js.Error>->Float->Void):TReturn {})
+  @:overload(function (name:String, callback:Null<js.Error>->ZFloat->Void):TReturn {})
   function zcard(name:String):TReturn;
 
   /**
     Increment the score of value in sorted set name by amount
     Returns a String representing the floating point value of the new score of the member
    **/
-  @:overload(function (name:String, value:Float, member:String, callback:Null<js.Error>->String->Void):TReturn {})
-  function zincrby(name:String, value:Float, member:String):TReturn;
+  @:overload(function (name:String, value:ZFloat, member:String, callback:Null<js.Error>->String->Void):TReturn {})
+  function zincrby(name:String, value:ZFloat, member:String):TReturn;
 
   // /**
   //   Intersect multiple sorted sets specified by keys into a new sorted set, dest. Scores in the destination will be
@@ -799,7 +799,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Return a range of values from sorted set name between start and end sorted in ascending order.
     start and end can be negative, indicating the end of the range.
     desc a boolean indicating whether to sort the results descendingly
-    withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
+    withscores indicates to return the scores along with the values.
    **/
   @:overload(function (name:String, start:Int, end:Int, withScores:ZWithScores,
         callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
@@ -809,19 +809,19 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
   /**
     Return a range of values from the sorted set name with scores between min and max.
-    withscores indicates to return the scores along with the values. The return type is a list of (value, score) pairs
+    withscores indicates to return the scores along with the values.
    **/
-  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
         callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
         callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores,
         callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores):TReturn {})
-  function zrangebyscore(name:String, min:Float, max:Float):TReturn;
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
+  function zrangebyscore(name:String, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Returns a 0-based value indicating the rank of key in sorted set name
@@ -846,8 +846,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Remove all elements in the sorted set name with scores between min and max. Returns the number of elements removed.
    **/
-  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zremrangebyscore(name:String, min:Float, max:Float):TReturn;
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Int->Void):TReturn {})
+  function zremrangebyscore(name:String, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Return a range of values from sorted set name between start and num sorted in descending order.
@@ -869,17 +869,17 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     score_cast_func a callable used to cast the score return value
    **/
-  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
         callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
         callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores,
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores,
         callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, limit:ZLimit, offset:Int, count:Int):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
-  @:overload(function (name:String, min:Float, max:Float, withScores:ZWithScores):TReturn {})
-  function zrevrangebyscore(name:String, min:Float, max:Float):TReturn;
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Array<String>->Void):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:String, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
+  function zrevrangebyscore(name:String, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Returns a 0-based value indicating the descending rank of key in sorted set name
@@ -1003,4 +1003,24 @@ abstract GenericRedisResponse(Dynamic)
 
 @:enum abstract ZLimit(String) to String {
   var Limit = 'LIMIT';
+}
+
+abstract ZFloat(String) to String {
+  public static var infinity(get,never):ZFloat;
+  public static var negativeInfinity(get,never):ZFloat;
+
+  @:extern inline private static function get_infinity():ZFloat {
+    return cast '+inf';
+  }
+  @:extern inline private static function get_negativeInfinity():ZFloat {
+    return cast '-inf';
+  }
+
+  @:from @:extern inline public static function fromFloat(f:Float):ZFloat {
+    return cast f + '';
+  }
+
+  @:to @:extern inline public function toFloat() {
+    return Std.parseFloat(this);
+  }
 }
