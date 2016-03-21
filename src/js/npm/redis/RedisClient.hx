@@ -147,6 +147,13 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   function subscribe(channel:String):TReturn;
 
+  /**
+    Subscribes to a pattern
+   **/
+  function psubscribe(channel:String):TReturn;
+
+  function publish(channel:String, message:String):TReturn;
+
   function publish(channel:String, message:String):TReturn;
 
   /**
