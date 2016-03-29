@@ -154,8 +154,6 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
   function publish(channel:String, message:String):TReturn;
 
-  function publish(channel:String, message:String):TReturn;
-
   /**
     MULTI commands are queued up until an EXEC is issued, and then all commands are run atomically by Redis. The
     interface in node_redis is to return an individual Multi object by calling client.multi(). If any command fails to
@@ -324,7 +322,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Delete keys from hash name
    **/
   @:overload(function (args:Array<String>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (key:String, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:String, key:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function hdel(name:String, keys:Rest<String>):TReturn;
 
   /**
