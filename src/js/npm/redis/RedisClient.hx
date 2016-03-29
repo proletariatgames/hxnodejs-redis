@@ -784,7 +784,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return the number of elements in the sorted set name
    **/
-  @:overload(function (name:String, callback:Null<js.Error>->ZFloat->Void):TReturn {})
+  @:overload(function (name:String, callback:Null<js.Error>->Int->Void):TReturn {})
   function zcard(name:String):TReturn;
 
   /**
