@@ -6,7 +6,7 @@
   "tags": ["nodejs", "redis", "db"],
   "description": "Externs for the request NPM module",
   "releasenote": "Initial release",
-  "version": "2.4.2",
+  "version": "2.4.3-alpha",
   "contributors": ["Proletariat", "lpetre", "danogles", "waneck"],
   "dependencies": {
     "hxnodejs": ""
