@@ -1,8 +1,19 @@
 package js.npm.redis;
+import js.node.buffer.Buffer;
 import js.node.events.EventEmitter;
 import haxe.DynamicAccess;
 import haxe.extern.Rest;
 import haxe.Constraints;
+
+abstract RedisString(Dynamic) from String from Buffer {
+  @:to public function asBuffer():Buffer {
+    return Std.is(this, Buffer) ? this : new Buffer(this);
+  }
+
+  @:to public function asString():String {
+    return Std.is(this, String) ? this : this.toString();
+  }
+}
 
 @:enum abstract RedisEvent<T:Function>(Event<T>) to Event<T> {
   /**
@@ -492,9 +503,9 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Returns a list of values ordered identically to keys
    **/
-  @:overload(function (args:Array<String>, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  @:overload(function (key:String, callback:Null<js.Error>->Array<String>->Void):TReturn {})
-  function mget(keys:Rest<String>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  function mget(keys:Rest<RedisString>):TReturn;
 
   /**
     Moves the key name to a different Redis database db
@@ -624,8 +635,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Set the value of key name to value that expires in time seconds
    **/
-  @:overload(function (name:String, time:Int, value:String, callback:Null<js.Error>->Int->Void):TReturn {})
-  function setex(name:String, time:Int, value:String):TReturn;
+  @:overload(function (name:RedisString, time:Int, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
+  function setex(name:RedisString, time:Int, value:RedisString):TReturn;
 
   /**
     Set the value of key name to value if key doesn’t exist
