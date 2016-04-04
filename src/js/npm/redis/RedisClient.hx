@@ -7,11 +7,11 @@ import haxe.Constraints;
 
 abstract RedisString(Dynamic) from String from Buffer {
   @:to public function asBuffer():Buffer {
-    return Std.is(this, Buffer) ? this : new Buffer(this);
+    return this == null || Std.is(this, Buffer) ? this : new Buffer(this);
   }
 
   @:to public function asString():String {
-    return Std.is(this, String) ? this : this.toString();
+    return this == null || Std.is(this, String) ? this : this.toString();
   }
 }
 
