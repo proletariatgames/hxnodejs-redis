@@ -124,6 +124,14 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   function end(flush:Bool):Void;
 
   /**
+    This sends the quit command to the redis server and ends cleanly right after all running commands were properly
+    handled. If this is called while reconnecting (and therefor no connection to the redis server exists) it is going to
+    end the connection right away instead of resulting in further reconnections! All offline commands are going to be
+    flushed with an error in that case.
+   **/
+  function quit():Void;
+
+  /**
     Call unref() on the underlying socket connection to the Redis server, allowing the program to exit once no more
     commands are pending.
 
@@ -156,6 +164,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     If you need to send regular commands to Redis while in subscriber mode, just open another connection.
    **/
+  @:overload(function(channels:Rest<RedisString>):TReturn {})
+  @:overload(function(channels:Array<RedisString>):TReturn {})
   function subscribe(channel:RedisString):TReturn;
 
   /**
@@ -163,6 +173,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   function psubscribe(channel:RedisString):TReturn;
 
+  @:overload(function(channel:RedisString, message:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function publish(channel:RedisString, message:RedisString):TReturn;
 
   /**
