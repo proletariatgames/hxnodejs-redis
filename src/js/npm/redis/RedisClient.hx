@@ -173,6 +173,11 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   function psubscribe(channel:RedisString):TReturn;
 
+  /**
+    Unsubscribe to a pattern
+   **/
+  function unsubscribe():Void;
+
   @:overload(function(channel:RedisString, message:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function publish(channel:RedisString, message:RedisString):TReturn;
 
