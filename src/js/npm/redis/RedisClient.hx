@@ -287,6 +287,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Delete one or more keys specified by names
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function del(keys:Rest<RedisString>):TReturn;
@@ -348,6 +349,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Delete keys from hash name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function hdel(name:RedisString, keys:Rest<RedisString>):TReturn;
@@ -385,6 +387,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Returns a list of values ordered identically to keys
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   function hmget(name:RedisString, keys:Rest<RedisString>):TReturn;
@@ -475,6 +478,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Push values onto the head of the list name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function lpush(name:RedisString, values:Rest<RedisString>):TReturn;
@@ -519,6 +523,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Returns a list of values ordered identically to keys
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   function mget(keys:Rest<RedisString>):TReturn;
@@ -532,6 +537,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Sets each key in the mapping dict to its corresponding value
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->RedisString->Void):TReturn {})
   @:overload(function (key:RedisString, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
   function mset(mapping:Rest<RedisString>):TReturn;
@@ -539,6 +545,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Sets each key in the mapping dict to its corresponding value if none of the keys are already set
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (key:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function msetnx(mapping:Rest<RedisString>):TReturn;
@@ -593,6 +600,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Push values onto the tail of the list name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, values:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function rpush(name:RedisString, values:Rest<RedisString>):TReturn;
@@ -606,6 +614,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Add value(s) to set name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function sadd(name:RedisString, values:Rest<RedisString>):TReturn;
@@ -625,6 +634,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return the difference of sets specified by keys
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   function sdiff(keys:Rest<RedisString>):TReturn;
@@ -632,6 +642,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Store the difference of sets specified by keys into a new set named dest. Returns the number of keys in the new set.
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (dest:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function sdiffstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
@@ -679,6 +690,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return the intersection of sets specified by keys
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   function sinter(keys:Rest<RedisString>):TReturn;
@@ -687,6 +699,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Store the intersection of sets specified by keys into a new set named dest. Returns the number of keys in the new
     set.
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (dest:RedisString, keys:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function sinterstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
@@ -762,6 +775,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Remove values from set name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, values:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function srem(name:RedisString, values:Rest<RedisString>):TReturn;
@@ -775,6 +789,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return the union of sets specifiued by keys
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   @:overload(function (keys:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
   function sunion(keys:Rest<RedisString>):TReturn;
@@ -782,6 +797,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Store the union of sets specified by keys into a new set named dest. Returns the number of keys in the new set.
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (dest:RedisString, keys:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function sunionstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
@@ -864,6 +880,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Remove member values from sorted set name
    **/
+  @:overload(function (args:Array<RedisString>):TReturn {})
   @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
   @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
   function zrem(name:RedisString, keys:Rest<RedisString>):TReturn;
