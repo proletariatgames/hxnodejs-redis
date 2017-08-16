@@ -186,7 +186,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     interface in node_redis is to return an individual Multi object by calling client.multi(). If any command fails to
     queue, all commands are rolled back and none is going to be executed (For further information look at transactions).
    **/
-  function multi():Multi;
+  function multi(?commandList :Array<Array<String>>):Multi;
 
   /**
     Identical to .multi without transactions. This is recommended if you want to execute many commands at once but don't
@@ -315,6 +315,16 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   @:overload(function (name:RedisString, when:Float, callback:Null<js.Error>->Int->Void):TReturn {})
   function expireat(name:RedisString, when:Float):TReturn;
+
+  /**
+    Evaluate Lua script
+   **/
+  public function eval(prms:Array<Dynamic>,cb:Null<js.Error>->Dynamic->Void):TReturn;
+
+  /**
+    Evaluate Lua script by its SHA digest
+   **/
+  public function evalsha(prms:Array<Dynamic>,cb:Null<js.Error>->Dynamic->Void):TReturn;
 
   /**
     Delete all keys in all databases on the current host
