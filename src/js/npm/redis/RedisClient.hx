@@ -1,6 +1,7 @@
 package js.npm.redis;
 import js.node.buffer.Buffer;
 import js.node.events.EventEmitter;
+import js.npm.redis.Callbacks;
 import haxe.DynamicAccess;
 import haxe.extern.Rest;
 import haxe.Constraints;
@@ -14,6 +15,29 @@ abstract RedisString(Dynamic) from String from Buffer {
     return this == null || Std.is(this, String) ? this : this.toString();
   }
 }
+
+typedef SimpleStringReply = String;
+
+@:enum abstract SimpleString(SimpleStringReply) from SimpleStringReply to SimpleStringReply
+{
+  var Ok = "OK";
+
+  inline public function toString()
+  {
+    return this;
+  }
+}
+
+@:forward abstract AnyKey(RedisString) from String from Buffer to RedisString from RedisString {}
+@:forward abstract Key(AnyKey) from String from Buffer from AnyKey to AnyKey to RedisString from RedisString {}
+@:forward abstract HashKey(AnyKey) from String from Buffer from AnyKey to AnyKey to RedisString from RedisString {}
+@:forward abstract SetKey(AnyKey) from String from Buffer from AnyKey to AnyKey to RedisString from RedisString {}
+@:forward abstract ZSetKey(AnyKey) from String from Buffer from AnyKey to AnyKey to RedisString from RedisString {}
+@:forward abstract ListKey(AnyKey) from String from Buffer from AnyKey to AnyKey to RedisString from RedisString {}
+// @:forward abstract Key(String) from String to String {}
+// @:forward abstract Key(String) from String to String {}
+
+
 
 @:enum abstract RedisEvent<T:Function>(Event<T>) to Event<T> {
   /**
@@ -112,7 +136,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Error: Ready check failed: ERR operation not permitted.
    **/
   @:overload(function(password:RedisString):TReturn {})
-  function auth(password:RedisString, callback:Null<js.Error>->Void):TReturn;
+  function auth(password:RedisString, callback:VoidCallback):TReturn;
 
   /**
     Forcibly close the connection to the Redis server. Note that this does not wait until all replies have been parsed.
@@ -144,18 +168,18 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     The reply from an HGETALL command will be converted into a JavaScript Object by node_redis. That way you can
     interact with the responses using JavaScript syntax.
    **/
-  function hgetall(name:RedisString, callback:Null<js.Error>->DynamicAccess<RedisString>->Void):TReturn;
+  function hgetall(name:HashKey, callback:Callback<DynamicAccess<RedisString>>):TReturn;
 
   /**
     Multiple values in a hash can be set by supplying an object:
    **/
-  @:overload(function (name:RedisString, obj:Dynamic<RedisString>):TReturn {})
-  @:overload(function (name:RedisString, obj:Dynamic<RedisString>, callback:Null<js.Error>->Void):TReturn {})
-  @:overload(function (name:RedisString, values:Rest<RedisString>):TReturn {})
-  @:overload(function (name:RedisString, values:Array<RedisString>):TReturn {})
-  @:overload(function (name:RedisString, values:Array<RedisString>, callback:Null<js.Error>->Void):TReturn {})
-  @:overload(function (name:RedisString, key:RedisString, value:RedisString, callback:Null<js.Error>->Void):TReturn {})
-  function hmset(name:RedisString, obj:DynamicAccess<RedisString>, callback:Null<js.Error>->Void):TReturn;
+  @:overload(function (name:HashKey, obj:Dynamic<String>):TReturn {})
+  @:overload(function (name:HashKey, obj:Dynamic<String>, callback:VoidCallback):TReturn {})
+  @:overload(function (name:HashKey, values:Rest<RedisString>):TReturn {})
+  @:overload(function (name:HashKey, values:Array<RedisString>):TReturn {})
+  @:overload(function (name:HashKey, values:Array<RedisString>, callback:VoidCallback):TReturn {})
+  @:overload(function (name:HashKey, key:RedisString, value:RedisString, callback:VoidCallback):TReturn {})
+  function hmset(name:HashKey, obj:Dynamic<String>, callback:VoidCallback):TReturn;
 
   /**
     When a client issues a SUBSCRIBE or PSUBSCRIBE, that connection is put into a "subscriber" mode. At that point, only
@@ -178,7 +202,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   function unsubscribe():Void;
 
-  @:overload(function(channel:RedisString, message:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function(channel:RedisString, message:RedisString, callback:Callback<Int>):TReturn {})
   function publish(channel:RedisString, message:RedisString):TReturn;
 
   /**
@@ -211,19 +235,19 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     Appends the string value to the value at key. If key doesn’t already exist, create it with a value of value. Returns
     the new length of the value at key.
    **/
-  @:overload(function(name:RedisString, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function append(name:RedisString, value:RedisString):TReturn;
+  @:overload(function(name:Key, value:RedisString, callback:Callback<RedisString>):TReturn {})
+  function append(name:Key, value:RedisString):TReturn;
 
   /**
     Tell the Redis server to rewrite the AOF file from data in memory.
    **/
-  @:overload(function(callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function(callback:Callback<RedisString>):TReturn {})
   function bgrewriteaof():TReturn;
 
   /**
     Tell the Redis server to save its data to disk.
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function bgsave():TReturn;
 
   // TODO: see how timeout is handled
@@ -236,7 +260,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   //  **/
   // @:overload(function (keys:Array<RedisString>):TReturn {})
   // @:overload(function (keys:Array<RedisString>, timeout:Int):TReturn {})
-  // @:overload(function (keys:Array<RedisString>, timeout:Int, callback:Null<js.Error>->RedisString->Void):TReturn {})
+  // @:overload(function (keys:Array<RedisString>, timeout:Int, callback:Callback<RedisString>):TReturn {})
   // function blpop(keys:Rest<RedisString>):TReturn;
 
   // TODO: see how timeout is handled
@@ -262,186 +286,186 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Returns the number of keys in the current database
    **/
-  @:overload(function (callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (callback:Callback<Int>):TReturn {})
   function dbsize():TReturn;
 
   /**
     Returns version specific metainformation about a give key
     `type` should be `object`
    **/
-  @:overload(function (type:RedisString, key:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (type:RedisString, key:RedisString, callback:Callback<RedisString>):TReturn {})
   function debug(type:RedisString, key:RedisString):TReturn;
 
   /**
     Decrements the value of key by 1. If no key exists, the value will be initialized as -1
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function decr(name:RedisString):TReturn;
+  @:overload(function (name:Key, callback:Callback<Int>):TReturn {})
+  function decr(name:Key):TReturn;
 
   /**
     Decrements the value of key by amount. If no key exists, the value will be initialized as 0 - amount
    **/
-  @:overload(function (name:RedisString, amount:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function decrby(name:RedisString, amount:Int):TReturn;
+  @:overload(function (name:Key, amount:Int, callback:Callback<Int>):TReturn {})
+  function decrby(name:Key, amount:Int):TReturn;
 
   /**
     Delete one or more keys specified by names
    **/
-  @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function del(keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<AnyKey>):TReturn {})
+  @:overload(function (args:Array<AnyKey>, callback:Callback<Int>):TReturn {})
+  @:overload(function (key:AnyKey, callback:Callback<Int>):TReturn {})
+  function del(keys:Rest<AnyKey>):TReturn;
 
   /**
     Echo the string back from the server
    **/
-  @:overload(function (value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (value:RedisString, callback:Callback<RedisString>):TReturn {})
   function echo(value:RedisString):TReturn;
 
   /**
     Returns an Int (0 = false, 1 = true) indicating whether key name exists
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function exists(name:RedisString):TReturn;
+  @:overload(function (name:AnyKey, callback:Callback<Int>):TReturn {})
+  function exists(name:AnyKey):TReturn;
 
   /**
     Set an expire flag on key name for time seconds
    **/
-  @:overload(function (name:RedisString, time:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function expire(name:RedisString, time:Int):TReturn;
+  @:overload(function (name:AnyKey, time:Int, callback:Callback<Int>):TReturn {})
+  function expire(name:AnyKey, time:Int):TReturn;
 
   /**
     Set an expire flag on key name. when can be represented as a float indicating unix time
    **/
-  @:overload(function (name:RedisString, when:Float, callback:Null<js.Error>->Int->Void):TReturn {})
-  function expireat(name:RedisString, when:Float):TReturn;
+  @:overload(function (name:AnyKey, when:Float, callback:Callback<Int>):TReturn {})
+  function expireat(name:AnyKey, when:Float):TReturn;
 
   /**
     Evaluate Lua script
    **/
-  public function eval(prms:Array<Dynamic>,cb:Null<js.Error>->Dynamic->Void):TReturn;
+  public function eval(prms:Array<Dynamic>,callback:Callback<Dynamic>):TReturn;
 
   /**
     Evaluate Lua script by its SHA digest
    **/
-  public function evalsha(prms:Array<Dynamic>,cb:Null<js.Error>->Dynamic->Void):TReturn;
+  public function evalsha(prms:Array<Dynamic>,callback:Callback<Dynamic>):TReturn;
 
   /**
     Delete all keys in all databases on the current host
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function flushall():TReturn;
 
   /**
     Delete all keys in the current database
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function flushdb():TReturn;
 
   /**
     Return the value at key name, or None if the key doesn’t exist
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function get(name:RedisString):TReturn;
+  @:overload(function (name:Key, callback:Callback<RedisString>):TReturn {})
+  function get(name:Key):TReturn;
 
   /**
     Returns a boolean indicating the value of offset in name
    **/
-  @:overload(function (name:RedisString, offset:Int, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (name:RedisString, offset:Int, callback:Callback<Int>):TReturn {})
   function getbit(name:RedisString, offset:Int):TReturn;
 
   /**
     Set the value at key name to value if key doesn’t exist Return the value at key name atomically
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function getset(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:Key, value:RedisString, callback:Callback<RedisString>):TReturn {})
+  function getset(name:Key, value:RedisString):TReturn;
 
   /**
     Delete keys from hash name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hdel(name:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:HashKey, key:RedisString, callback:Callback<Int>):TReturn {})
+  function hdel(name:HashKey, keys:Rest<RedisString>):TReturn;
 
   /**
     Returns an Int (0 = false, 1 = true) indicating if key exists within hash name
    **/
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hexists(name:RedisString, key:RedisString):TReturn;
+  @:overload(function (name:HashKey, key:RedisString, callback:Callback<Int>):TReturn {})
+  function hexists(name:HashKey, key:RedisString):TReturn;
 
   /**
     Return the value of key within the hash name
    **/
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function hget(name:RedisString, key:RedisString):TReturn;
+  @:overload(function (name:HashKey, key:RedisString, callback:Callback<RedisString>):TReturn {})
+  function hget(name:HashKey, key:RedisString):TReturn;
 
   /**
     Increment the value of key in hash name by amount
    **/
-  @:overload(function (name:RedisString, key:RedisString, amount:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hincrby(name:RedisString, key:RedisString, amount:Int):TReturn;
+  @:overload(function (name:HashKey, key:RedisString, amount:Int, callback:Callback<Int>):TReturn {})
+  function hincrby(name:HashKey, key:RedisString, amount:Int):TReturn;
 
   /**
     Return the list of keys within hash name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function hkeys(name:RedisString):TReturn;
+  @:overload(function (name:HashKey, callback:Callback<Array<RedisString>>):TReturn {})
+  function hkeys(name:HashKey):TReturn;
 
   /**
     Return the number of elements in hash name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hlen(name:RedisString):TReturn;
+  @:overload(function (name:HashKey, callback:Callback<Int>):TReturn {})
+  function hlen(name:HashKey):TReturn;
 
   /**
     Returns a list of values ordered identically to keys
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function hmget(name:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (key:HashKey, callback:Callback<Array<RedisString>>):TReturn {})
+  function hmget(name:HashKey, keys:Rest<RedisString>):TReturn;
 
   /**
     Set key to value within hash name Returns 1 if HSET created a new field, otherwise 0
    **/
-  @:overload(function (name:RedisString, key:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hset(name:RedisString, key:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:HashKey, key:RedisString, value:RedisString, callback:Callback<Int>):TReturn {})
+  function hset(name:HashKey, key:RedisString, value:RedisString):TReturn;
 
   /**
     Set key to value within hash name if key does not exist. Returns 1 if HSETNX created a field, otherwise 0.
    **/
-  @:overload(function (name:RedisString, key:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function hsetnx(name:RedisString, key:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:HashKey, key:RedisString, value:RedisString, callback:Callback<Int>):TReturn {})
+  function hsetnx(name:HashKey, key:RedisString, value:RedisString):TReturn;
 
   /**
     Return the list of values within hash name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function hvals(name:RedisString):TReturn;
+  @:overload(function (name:HashKey, callback:Callback<Array<RedisString>>):TReturn {})
+  function hvals(name:HashKey):TReturn;
 
   /**
     Increments the value of key by 1. If no key exists, the value will be initialized as 1
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function incr(name:RedisString):TReturn;
+  @:overload(function (name:Key, callback:Callback<Int>):TReturn {})
+  function incr(name:Key):TReturn;
 
   /**
     Increments the value of key by amount. If no key exists, the value will be initialized as amount
    **/
-  @:overload(function (name:RedisString, amount:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function incrby(name:RedisString, amount:Int):TReturn;
+  @:overload(function (name:Key, amount:Int, callback:Callback<Int>):TReturn {})
+  function incrby(name:Key, amount:Int):TReturn;
 
   /**
     Returns a list of keys matching pattern
    **/
-  @:overload(function (pattern:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  @:overload(function (pattern:RedisString, callback:Callback<Array<RedisString>>):TReturn {})
   function keys(pattern:RedisString):TReturn;
 
   /**
     Return a unix timestamp representing the last time the Redis database was saved to disk
    **/
-  @:overload(function (callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (callback:Callback<Int>):TReturn {})
   function lastsave():TReturn;
 
   /**
@@ -449,23 +473,23 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     Negative indexes are supported and will return an item at the end of the list
    **/
-  @:overload(function (name:RedisString, index:Int, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function lindex(name:RedisString, index:Int):TReturn;
+  @:overload(function (name:ListKey, index:Int, callback:Callback<RedisString>):TReturn {})
+  function lindex(name:ListKey, index:Int):TReturn;
 
   /**
     Insert value in list name either immediately before or after [where] refvalue
 
     Returns the new length of the list on success or -1 if refvalue is not in the list.
    **/
-  @:overload(function (name:RedisString, where:BeforeAfter, refvalue:RedisString, value:RedisString,
-        callback:Null<js.Error>->Int->Void):TReturn {})
-  function linsert(name:RedisString, where:BeforeAfter, refvalue:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:ListKey, where:BeforeAfter, refvalue:RedisString, value:RedisString,
+        callback:Callback<Int>):TReturn {})
+  function linsert(name:ListKey, where:BeforeAfter, refvalue:RedisString, value:RedisString):TReturn;
 
   /**
     Return the length of the list name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function llen(name:RedisString):TReturn;
+  @:overload(function (name:ListKey, callback:Callback<Int>):TReturn {})
+  function llen(name:ListKey):TReturn;
 
   // TODO: see how timeout is handled
   // /**
@@ -482,30 +506,30 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Remove and return the first item of the list name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function lpop(name:RedisString):TReturn;
+  @:overload(function (name:ListKey, callback:Callback<RedisString>):TReturn {})
+  function lpop(name:ListKey):TReturn;
 
   /**
     Push values onto the head of the list name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function lpush(name:RedisString, values:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ListKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function lpush(name:ListKey, values:Rest<RedisString>):TReturn;
 
   /**
     Push value onto the head of the list name if name exists
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function lpushx(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:ListKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function lpushx(name:ListKey, value:RedisString):TReturn;
 
   /**
     Return a slice of the list name between position start and end - end included
 
     start and end can be negative numbers just like Python slicing notation
    **/
-  @:overload(function (name:RedisString, start:Int, end:Int, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function lrange(name:RedisString, start:Int, end:Int):TReturn;
+  @:overload(function (name:ListKey, start:Int, end:Int, callback:Callback<Array<RedisString>>):TReturn {})
+  function lrange(name:ListKey, start:Int, end:Int):TReturn;
 
   /**
     Remove the first count occurrences of elements equal to value from the list stored at name.
@@ -513,51 +537,51 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     The count argument influences the operation in the following ways:
     count > 0: Remove elements equal to value moving from head to tail. count < 0: Remove elements equal to value moving from tail to head. count = 0: Remove all elements equal to value.
    **/
-  @:overload(function (name:RedisString, count:Int, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function lrem(name:RedisString, count:Int, value:RedisString):TReturn;
+  @:overload(function (name:ListKey, count:Int, value:RedisString, callback:Callback<Int>):TReturn {})
+  function lrem(name:ListKey, count:Int, value:RedisString):TReturn;
 
   /**
     Set position of list name to value
    **/
-  @:overload(function (name:RedisString, index:Int, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function lset(name:RedisString, index:Int, value:RedisString):TReturn;
+  @:overload(function (name:ListKey, index:Int, value:RedisString, callback:Callback<RedisString>):TReturn {})
+  function lset(name:ListKey, index:Int, value:RedisString):TReturn;
 
   /**
     Trim the list name, removing all values not within the slice between start and end - end included
 
     start and end can be negative numbers just like Python slicing notation
    **/
-  @:overload(function (name:RedisString, start:Int, end:Int, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function ltrim(name:RedisString, start:Int, end:Int):TReturn;
+  @:overload(function (name:ListKey, start:Int, end:Int, callback:Callback<RedisString>):TReturn {})
+  function ltrim(name:ListKey, start:Int, end:Int):TReturn;
 
   /**
     Returns a list of values ordered identically to keys
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  @:overload(function (args:Array<RedisString>, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (key:Key, callback:Callback<Array<RedisString>>):TReturn {})
   function mget(keys:Rest<RedisString>):TReturn;
 
   /**
     Moves the key name to a different Redis database db
    **/
-  @:overload(function (name:RedisString, db:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function move(name:RedisString, db:RedisString):TReturn;
+  @:overload(function (name:AnyKey, db:RedisString, callback:Callback<Int>):TReturn {})
+  function move(name:AnyKey, db:RedisString):TReturn;
 
   /**
     Sets each key in the mapping dict to its corresponding value
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  @:overload(function (key:RedisString, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (args:Array<RedisString>, callback:Callback<RedisString>):TReturn {})
+  @:overload(function (key:Key, value:RedisString, callback:Callback<RedisString>):TReturn {})
   function mset(mapping:Rest<RedisString>):TReturn;
 
   /**
     Sets each key in the mapping dict to its corresponding value if none of the keys are already set
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (key:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (key:Key, value:RedisString, callback:Callback<Int>):TReturn {})
   function msetnx(mapping:Rest<RedisString>):TReturn;
 
   // /**
@@ -568,118 +592,125 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Removes an expiration on name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function persist(name:RedisString):TReturn;
+  @:overload(function (name:AnyKey, callback:Callback<Int>):TReturn {})
+  function persist(name:AnyKey):TReturn;
 
   /**
     Ping the Redis server
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function ping():TReturn;
 
   /**
     Returns the name of a random key
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function randomkey():TReturn;
 
   /**
     Rename key src to dst
    **/
-  @:overload(function (src:RedisString, dst:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function rename(src:RedisString, dst:RedisString):TReturn;
+  @:overload(function (src:AnyKey, dst:AnyKey, callback:Callback<RedisString>):TReturn {})
+  function rename(src:AnyKey, dst:AnyKey):TReturn;
 
   /**
     Rename key src to dst if dst doesn’t already exist
    **/
-  @:overload(function (src:RedisString, dst:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function renamenx(src:RedisString, dst:RedisString):TReturn;
+  @:overload(function (src:AnyKey, dst:AnyKey, callback:Callback<Int>):TReturn {})
+  function renamenx(src:AnyKey, dst:AnyKey):TReturn;
 
   /**
     Remove and return the last item of the list name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function rpop(name:RedisString):TReturn;
+  @:overload(function (name:ListKey, callback:Callback<RedisString>):TReturn {})
+  function rpop(name:ListKey):TReturn;
 
   /**
     RPOP a value off of the src list and atomically LPUSH it on to the dst list. Returns the value.
    **/
-  @:overload(function (src:RedisString, dst:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function rpoplpush(src:RedisString, dst:RedisString):TReturn;
+  @:overload(function (src:ListKey, dst:ListKey, callback:Callback<RedisString>):TReturn {})
+  function rpoplpush(src:ListKey, dst:ListKey):TReturn;
 
   /**
     Push values onto the tail of the list name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, values:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function rpush(name:RedisString, values:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ListKey, values:RedisString, callback:Callback<Int>):TReturn {})
+  function rpush(name:ListKey, values:Rest<RedisString>):TReturn;
 
   /**
     Push value onto the tail of the list name if name exists
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function rpushx(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:ListKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function rpushx(name:ListKey, value:RedisString):TReturn;
 
   /**
     Add value(s) to set name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function sadd(name:RedisString, values:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:SetKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function sadd(name:SetKey, values:Rest<RedisString>):TReturn;
 
   /**
     Tell the Redis server to save its data to disk. Blocks all requests until finished
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function save():TReturn;
 
   /**
     Return the number of elements in set name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function scard(name:RedisString):TReturn;
+  @:overload(function (name:SetKey, callback:Callback<Int>):TReturn {})
+  function scard(name:SetKey):TReturn;
 
   /**
     Return the difference of sets specified by keys
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  @:overload(function (args:Array<RedisString>, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (key:SetKey, callback:Callback<Array<RedisString>>):TReturn {})
   function sdiff(keys:Rest<RedisString>):TReturn;
 
   /**
     Store the difference of sets specified by keys into a new set named dest. Returns the number of keys in the new set.
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (dest:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function sdiffstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (dest:SetKey, key:SetKey, callback:Callback<Int>):TReturn {})
+  function sdiffstore(dest:SetKey, keys:Rest<SetKey>):TReturn;
 
   /**
     Set the value at key name to value
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function set(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:Key, value:RedisString, callback:Callback<SimpleString>):TReturn {})
+  @:overload(function (name:Key, value:RedisString, expOpt:SetExpireOptions, secsOrMs:Int, opt:SetOptions):TReturn {})
+  @:overload(function (name:Key, value:RedisString, expOpt:SetExpireOptions, secsOrMs:Int):TReturn {})
+  @:overload(function (name:Key, value:RedisString, expOpt:SetExpireOptions, secsOrMs:Int, opt:SetOptions, callback:Callback<SimpleString>):TReturn {})
+  @:overload(function (name:Key, value:RedisString, expOpt:SetExpireOptions, secsOrMs:Int, callback:Callback<SimpleString>):TReturn {})
+  @:overload(function (name:Key, value:RedisString, opt:SetOptions):TReturn {})
+  @:overload(function (name:Key, value:RedisString, opt:SetOptions, callback:Callback<SimpleString>):TReturn {})
+  @:overload(function (name:Key, value:RedisString, callback:Callback<SimpleString>):TReturn {})
+  function set(name:Key, value:RedisString):TReturn;
 
   /**
     Flag the offset in name as value. Returns an Int indicating the previous value of offset.
    **/
-  @:overload(function (name:RedisString, offset:Int, value:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function setbit(name:RedisString, offset:Int, value:Int):TReturn;
+  @:overload(function (name:Key, offset:Int, value:Int, callback:Callback<Int>):TReturn {})
+  function setbit(name:Key, offset:Int, value:Int):TReturn;
 
   /**
     Set the value of key name to value that expires in time seconds
    **/
-  @:overload(function (name:RedisString, time:Int, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function setex(name:RedisString, time:Int, value:RedisString):TReturn;
+  @:overload(function (name:Key, time:Int, value:RedisString, callback:Callback<Int>):TReturn {})
+  function setex(name:Key, time:Int, value:RedisString):TReturn;
 
   /**
     Set the value of key name to value if key doesn’t exist
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function setnx(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:Key, value:RedisString, callback:Callback<Int>):TReturn {})
+  function setnx(name:Key, value:RedisString):TReturn;
 
   /**
     Overwrite bytes in the value of name starting at offset with value. If offset plus the length of value exceeds the
@@ -688,43 +719,43 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     Returns the length of the new string.
    **/
-  @:overload(function (name:RedisString, offset:Int, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function setrange(name:RedisString, offset:Int, value:RedisString):TReturn;
+  @:overload(function (name:Key, offset:Int, value:RedisString, callback:Callback<Int>):TReturn {})
+  function setrange(name:Key, offset:Int, value:RedisString):TReturn;
 
   /**
     Shutdown the server
    **/
-  @:overload(function (callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (callback:Callback<RedisString>):TReturn {})
   function shutdown():TReturn;
 
   /**
     Return the intersection of sets specified by keys
    **/
-  @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (key:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function sinter(keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<SetKey>):TReturn {})
+  @:overload(function (args:Array<SetKey>, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (key:SetKey, callback:Callback<Array<RedisString>>):TReturn {})
+  function sinter(keys:Rest<SetKey>):TReturn;
 
   /**
     Store the intersection of sets specified by keys into a new set named dest. Returns the number of keys in the new
     set.
    **/
-  @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (dest:RedisString, keys:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function sinterstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<SetKey>):TReturn {})
+  @:overload(function (args:Array<SetKey>, callback:Callback<Int>):TReturn {})
+  @:overload(function (dest:SetKey, keys:SetKey, callback:Callback<Int>):TReturn {})
+  function sinterstore(dest:SetKey, keys:Rest<SetKey>):TReturn;
 
   /**
     Return an Int indicating if value is a member of set name
    **/
-  @:overload(function (name:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function sismember(name:RedisString, value:RedisString):TReturn;
+  @:overload(function (name:SetKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function sismember(name:SetKey, value:RedisString):TReturn;
 
   /**
     Set the server to be a replicated slave of the instance identified by the host and port. If called without
     arguements, the instance is promoted to a master instead.
    **/
-  @:overload(function (host:RedisString, port:Int, callback:Null<js.Error>->RedisString->Void):TReturn {})
+  @:overload(function (host:RedisString, port:Int, callback:Callback<RedisString>):TReturn {})
   function slaveof(host:RedisString, port:Int):TReturn;
 
   // /**
@@ -745,14 +776,14 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return all members of the set name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  function smembers(name:RedisString):TReturn;
+  @:overload(function (name:SetKey, callback:Callback<Array<RedisString>>):TReturn {})
+  function smembers(name:SetKey):TReturn;
 
   /**
     Move value from set src to set dst atomically
    **/
-  @:overload(function (src:RedisString, dst:RedisString, value:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function smove(src:RedisString, dst:RedisString, value:RedisString):TReturn;
+  @:overload(function (src:SetKey, dst:SetKey, value:RedisString, callback:Callback<Int>):TReturn {})
+  function smove(src:SetKey, dst:SetKey, value:RedisString):TReturn;
 
   // TODO
 //   /**
@@ -773,85 +804,90 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Remove and return a random member of set name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function spop(name:RedisString):TReturn;
+  @:overload(function (name:SetKey, callback:Callback<RedisString>):TReturn {})
+  function spop(name:SetKey):TReturn;
 
   /**
     Return a random member of set name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function srandmember(name:RedisString):TReturn;
+  @:overload(function (name:SetKey, callback:Callback<RedisString>):TReturn {})
+  function srandmember(name:SetKey):TReturn;
 
   /**
     Remove values from set name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, values:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function srem(name:RedisString, values:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:SetKey, values:RedisString, callback:Callback<Int>):TReturn {})
+  function srem(name:SetKey, values:Rest<RedisString>):TReturn;
 
   /**
     Return the number of bytes stored in the value of name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function strlen(name:RedisString):TReturn;
+  @:overload(function (name:Key, callback:Callback<Int>):TReturn {})
+  function strlen(name:Key):TReturn;
 
   /**
     Return the union of sets specifiued by keys
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (keys:RedisString, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
+  @:overload(function (args:Array<RedisString>, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (keys:SetKey, callback:Callback<Array<RedisString>>):TReturn {})
   function sunion(keys:Rest<RedisString>):TReturn;
 
   /**
     Store the union of sets specified by keys into a new set named dest. Returns the number of keys in the new set.
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (dest:RedisString, keys:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function sunionstore(dest:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (dest:SetKey, keys:RedisString, callback:Callback<Int>):TReturn {})
+  function sunionstore(dest:SetKey, keys:Rest<RedisString>):TReturn;
 
   /**
     Returns the number of seconds until the key name will expire
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function ttl(name:RedisString):TReturn;
+  @:overload(function (name:AnyKey, callback:Callback<Int>):TReturn {})
+  function ttl(name:AnyKey):TReturn;
 
   /**
     Returns the type of key name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function type(name:RedisString):TReturn;
+  @:overload(function (name:AnyKey, callback:Callback<RedisString>):TReturn {})
+  function type(name:AnyKey):TReturn;
+
+  /**
+    Marks the given keys to be watched for conditional execution of a transaction.
+  **/
+  function watch(key:AnyKey):TReturn;
 
   /**
     Set any number of score, element-name pairs to the key name
    **/
-  @:overload(function (name:RedisString, opt:ZAddOptions, score:ZFloat, member:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, opt:ZAddOptions, score:ZFloat, member:RedisString):TReturn {})
-  @:overload(function (name:RedisString, score:ZFloat, member:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, score:ZFloat, member:RedisString, scoreMemebers:Rest<Dynamic>):TReturn {})
-  @:overload(function (args:Array<Dynamic>, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zadd(name:RedisString, score:ZFloat, member:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, score:ZFloat, member:RedisString):TReturn {})
+  @:overload(function (name:ZSetKey, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ZSetKey, score:ZFloat, member:RedisString, scoreMemebers:Rest<Dynamic>):TReturn {})
+  @:overload(function (args:Array<Dynamic>, callback:Callback<Int>):TReturn {})
+  function zadd(name:ZSetKey, score:ZFloat, member:RedisString):TReturn;
 
   /**
     Return the number of elements in the sorted set name
    **/
-  @:overload(function (name:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zcard(name:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, callback:Callback<Int>):TReturn {})
+  function zcard(name:ZSetKey):TReturn;
 
   /**
     Increment the score of value in sorted set name by amount
     Returns a RedisString representing the floating point value of the new score of the member
    **/
-  @:overload(function (name:RedisString, value:ZFloat, member:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function zincrby(name:RedisString, value:ZFloat, member:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, value:ZFloat, member:RedisString, callback:Callback<RedisString>):TReturn {})
+  function zincrby(name:ZSetKey, value:ZFloat, member:RedisString):TReturn;
 
   // /**
   //   Intersect multiple sorted sets specified by keys into a new sorted set, dest. Scores in the destination will be
   //   aggregated based on the aggregate, or SUM if none is provided.
   //  **/
-  // function zinterstore(dest:RedisString, numkeys:Int, key, keys, aggregate=None):TReturn;
+  // function zinterstore(dest:ZSetKey, numkeys:Int, key, keys, aggregate=None):TReturn;
 
   /**
     Return a range of values from sorted set name between start and end sorted in ascending order.
@@ -859,65 +895,65 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     desc a boolean indicating whether to sort the results descendingly
     withscores indicates to return the scores along with the values.
    **/
-  @:overload(function (name:RedisString, start:Int, end:Int, withScores:ZWithScores,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, start:Int, end:Int, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, start:Int, end:Int, withScores:ZWithScores):TReturn {})
-  function zrange(name:RedisString, start:Int, end:Int):TReturn;
+  @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, start:Int, end:Int, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores):TReturn {})
+  function zrange(name:ZSetKey, start:Int, end:Int):TReturn;
 
   /**
     Return a range of values from the sorted set name with scores between min and max.
     withscores indicates to return the scores along with the values.
    **/
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
-        callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
-  function zrangebyscore(name:RedisString, min:ZFloat, max:ZFloat):TReturn;
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
+        callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
+  function zrangebyscore(name:ZSetKey, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Returns a 0-based value indicating the rank of key in sorted set name
    **/
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Null<Int>->Void):TReturn {})
-  function zrank(name:RedisString, key:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, key:RedisString, callback:Callback<Null<Int>>):TReturn {})
+  function zrank(name:ZSetKey, key:RedisString):TReturn;
 
   /**
     Remove member values from sorted set name
    **/
   @:overload(function (args:Array<RedisString>):TReturn {})
-  @:overload(function (args:Array<RedisString>, callback:Null<js.Error>->Int->Void):TReturn {})
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zrem(name:RedisString, keys:Rest<RedisString>):TReturn;
+  @:overload(function (args:Array<RedisString>, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ZSetKey, key:RedisString, callback:Callback<Int>):TReturn {})
+  function zrem(name:ZSetKey, keys:Rest<RedisString>):TReturn;
 
   /**
     Remove all elements in the sorted set name with ranks between min and max. Values are 0-based, ordered from smallest
     score to largest. Values can be negative indicating the highest scores. Returns the number of elements removed
    **/
-  @:overload(function (name:RedisString, min:Int, max:Int, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zremrangebyrank(name:RedisString, min:Int, max:Int):TReturn;
+  @:overload(function (name:ZSetKey, min:Int, max:Int, callback:Callback<Int>):TReturn {})
+  function zremrangebyrank(name:ZSetKey, min:Int, max:Int):TReturn;
 
   /**
     Remove all elements in the sorted set name with scores between min and max. Returns the number of elements removed.
    **/
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zremrangebyscore(name:RedisString, min:ZFloat, max:ZFloat):TReturn;
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, callback:Callback<Int>):TReturn {})
+  function zremrangebyscore(name:ZSetKey, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Return a range of values from sorted set name between start and num sorted in descending order.
     start and num can be negative, indicating the end of the range.
     withscores indicates to return the scores along with the values The return type is a list of (value, score) pairs
    **/
-  @:overload(function (name:RedisString, start:Int, end:Int, withScores:ZWithScores,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, start:Int, end:Int, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, start:Int, end:Int, withScores:ZWithScores):TReturn {})
-  function zrevrange(name:RedisString, start:Int, num:Int):TReturn;
+  @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, start:Int, end:Int, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores):TReturn {})
+  function zrevrange(name:ZSetKey, start:Int, num:Int):TReturn;
 
   /**
     Return a range of values from the sorted set name with scores between min and max in descending order.
@@ -928,30 +964,30 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     score_cast_func a callable used to cast the score return value
    **/
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
-        callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores,
-        callback:Null<js.Error>->Array<Dynamic>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, callback:Null<js.Error>->Array<RedisString>->Void):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
-  @:overload(function (name:RedisString, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
-  function zrevrangebyscore(name:RedisString, min:ZFloat, max:ZFloat):TReturn;
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
+        callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores,
+        callback:Callback<Array<Dynamic>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
+  function zrevrangebyscore(name:ZSetKey, min:ZFloat, max:ZFloat):TReturn;
 
   /**
     Returns a 0-based value indicating the descending rank of key in sorted set name
    **/
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->Int->Void):TReturn {})
-  function zrevrank(name:RedisString, key:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, key:RedisString, callback:Callback<Int>):TReturn {})
+  function zrevrank(name:ZSetKey, key:RedisString):TReturn;
 
   /**
     Return the score of element key in sorted set name
     Returns a string representing a Float
    **/
-  @:overload(function (name:RedisString, key:RedisString, callback:Null<js.Error>->RedisString->Void):TReturn {})
-  function zscore(name:RedisString, key:RedisString):TReturn;
+  @:overload(function (name:ZSetKey, key:RedisString, callback:Callback<RedisString>):TReturn {})
+  function zscore(name:ZSetKey, key:RedisString):TReturn;
 
   // /**
   //   Union multiple sorted sets specified by keys into a new sorted set, dest. Scores in the destination will be
@@ -974,19 +1010,19 @@ extern class Multi extends RedisClientBase<Multi, Multi> {
 
     You can either chain together MULTI commands as in the above example, or you can queue individual commands while
     still sending regular client command as in this example:
+
+    Warning: As of version 2.8.0, errors that occur on individual calls may still send a null Error object, and instead
+    send the error inside the result array. So be sure to check the individual elements if they are errors - there are the
+    convenience `asError` / `isError` helpers on each MultiRedisResponse object
    **/
-  @:overload(function(callback:Null<MultiError>->Array<GenericRedisResponse>->Void):Void {})
+  @:overload(function(callback:ErrCallback<AggregateError, MultiRedisResponseArray>):Void {})
   function exec():Void;
 
   /**
     Identical to Multi.exec but with the difference that executing a single command will not use transactions.
    **/
-  @:overload(function(callback:Null<MultiError>->Array<GenericRedisResponse>->Void):Void {})
+  @:overload(function(callback:ErrCallback<AggregateError, MultiRedisResponseArray>):Void {})
   function exec_atomic():Void;
-}
-
-extern class MultiError extends js.Error {
-  public var errors:Array<js.Error>;
 }
 
 @:enum abstract BeforeAfter(String) from String {
@@ -994,13 +1030,89 @@ extern class MultiError extends js.Error {
   var After = "AFTER";
 }
 
+@:forward
+abstract MultiRedisResponseArray(Array<MultiRedisResponse>) from Array<MultiRedisResponse> to Array<MultiRedisResponse>
+{
+  @:extern inline public function getFirstError()
+  {
+    var ret = null;
+    for (obj in this)
+    {
+      ret = obj.asError();
+      if (ret != null)
+      {
+        break;
+      }
+    }
+    return ret;
+  }
+
+  @:extern inline public function hasAnyErrors()
+  {
+    var ret = false;
+    for (obj in this)
+    {
+      if (obj.isError())
+      {
+        ret = true;
+        break;
+      }
+    }
+    return ret;
+  }
+}
+
+@:forward
+abstract MultiRedisResponse(Dynamic)
+  from GenericRedisResponse
+  to GenericRedisResponse
+  from RedisError
+  to RedisError
+{
+  @:extern inline public function asError():RedisError {
+    if (Std.is(this, RedisError)) {
+      return cast this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function isError():Bool {
+    return Std.is(this, RedisError);
+  }
+
+  @:extern inline public function asArray():Array<String> {
+    if (Std.is(this, Array)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function asString():String {
+    if (Std.is(this, String)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function asInt():Null<Int> {
+    if (Std.is(this, Int)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+}
+
 abstract GenericRedisResponse(Dynamic)
   from Dynamic
-  from Array<String> to Array<String>
+  from Array<GenericRedisResponse> to Array<GenericRedisResponse>
   from String to String
   from Int to Int
 {
-  @:extern inline public function asArray():Array<String> {
+  @:extern inline public function asArray():Array<GenericRedisResponse> {
     if (Std.is(this, Array)) {
       return this;
     } else {
@@ -1050,6 +1162,29 @@ abstract GenericRedisResponse(Dynamic)
   var Incr = 'INCR';
 }
 
+@:enum abstract SetExpireOptions(String) to String {
+  /**
+    Expire argument is in seconds
+  **/
+  var Ex = "EX";
+  /**
+    Expire argument is in milliseconds
+  **/
+  var Px = "PX";
+}
+
+@:enum abstract SetOptions(String) to String {
+  /**
+    Only set the key if it already exists. Returns null if the condition fails
+  **/
+  var Xx = "XX";
+
+  /**
+    Only set the key if it does not already exist. Returns null if the condition fails
+  **/
+  var Nx = "NX";
+}
+
 @:enum abstract ZAggregate(String) to String {
   var Sum = 'SUM';
   var Min = 'MIN';
@@ -1082,4 +1217,40 @@ abstract ZFloat(String) to String {
   @:to @:extern inline public function toFloat() {
     return Std.parseFloat(this);
   }
+}
+
+@:enum abstract ErrorCode(String) from String to String
+{
+  /**
+    Returns if the client connection was dropped
+  **/
+  var ClosedError = "NR_CLOSED";
+
+  /**
+    If an unresolved command was rejected
+  **/
+  var UncertainState = "UNCERTAIN_STATE";
+
+  /**
+    In case node_redis gives up to reconnect
+  **/
+  var ConnectionBroken = "CONNECTION_BROKEN";
+}
+
+@:jsRequire("redis", "RedisError")
+extern class RedisError extends js.Error {
+  public var code(default, null):ErrorCode;
+}
+@:jsRequire("redis", "ReplyError")
+extern class ReplyError extends RedisError {
+  public var command(default, null):String;
+  public var args(default, null):Array<Dynamic>;
+}
+@:jsRequire("redis", "AbortError")
+extern class AbortError extends RedisError {}
+@:jsRequire("redis", "ParserError")
+extern class ParserError extends RedisError {}
+@:jsRequire("redis", "AggregateError")
+extern class AggregateError extends AbortError {
+  public var errors(default, null):Array<RedisError>;
 }
