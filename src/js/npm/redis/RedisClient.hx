@@ -865,6 +865,10 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
    **/
   @:overload(function (name:ZSetKey, opt:ZAddOptions, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
   @:overload(function (name:ZSetKey, opt:ZAddOptions, score:ZFloat, member:RedisString):TReturn {})
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, opt2:ZAddOptions, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, opt2:ZAddOptions, score:ZFloat, member:RedisString):TReturn {})
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, opt2:ZAddOptions, opt3:ZAddOptions, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
+  @:overload(function (name:ZSetKey, opt:ZAddOptions, opt2:ZAddOptions, opt3:ZAddOptions, score:ZFloat, member:RedisString):TReturn {})
   @:overload(function (name:ZSetKey, score:ZFloat, member:RedisString, callback:Callback<Int>):TReturn {})
   @:overload(function (name:ZSetKey, score:ZFloat, member:RedisString, scoreMemebers:Rest<Dynamic>):TReturn {})
   @:overload(function (args:Array<Dynamic>, callback:Callback<Int>):TReturn {})
@@ -1015,13 +1019,13 @@ extern class Multi extends RedisClientBase<Multi, Multi> {
     send the error inside the result array. So be sure to check the individual elements if they are errors - there are the
     convenience `asError` / `isError` helpers on each MultiRedisResponse object
    **/
-  @:overload(function(callback:ErrCallback<AggregateError, MultiRedisResponseArray>):Void {})
+  @:overload(function(callback:ExecCallback):Void {})
   function exec():Void;
 
   /**
     Identical to Multi.exec but with the difference that executing a single command will not use transactions.
    **/
-  @:overload(function(callback:ErrCallback<AggregateError, MultiRedisResponseArray>):Void {})
+  @:overload(function(callback:ExecCallback):Void {})
   function exec_atomic():Void;
 }
 
@@ -1252,5 +1256,9 @@ extern class AbortError extends RedisError {}
 extern class ParserError extends RedisError {}
 @:jsRequire("redis", "AggregateError")
 extern class AggregateError extends AbortError {
+  public var errors(default, null):Array<RedisError>;
+}
+
+extern class ExecError extends RedisError {
   public var errors(default, null):Array<RedisError>;
 }
