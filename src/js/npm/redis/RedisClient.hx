@@ -90,14 +90,14 @@ typedef SimpleStringReply = String;
     Client will emit message for every message received that matches an active subscription. Listeners are passed the
     channel name as channel and the message Buffer as message.
    **/
-  var Message : RedisSubscriptionEvent<String->String->Void> = "message"; /** (channel, message) **/
+  var Message : RedisSubscriptionEvent<RedisString->RedisString->Void> = "message"; /** (channel, message) **/
 
   /**
     Client will emit pmessage for every message received that matches an active subscription pattern. Listeners are passed
     the original pattern used with PSUBSCRIBE as pattern, the sending channel name as channel, and the message Buffer as
     message.
    **/
-  var PMessage : RedisSubscriptionEvent<String->String->String->Void> = "pmessage"; /** (pattern, channel, message) **/
+  var PMessage : RedisSubscriptionEvent<RedisString->RedisString->RedisString->Void> = "pmessage"; /** (pattern, channel, message) **/
 
   /**
     Client will emit subscribe in response to a SUBSCRIBE command. Listeners are passed the channel name as channel and

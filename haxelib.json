@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["nodejs", "hxnodejs", "redis", "db"],
   "description": "Externs for the redis NPM module",
-  "releasenote": "Initial release",
-  "version": "2.8.0-alpha",
+  "releasenote": "Fixed message/pmessage signature to support `return_buffers:true` option",
+  "version": "2.8.1",
   "contributors": ["Proletariat", "lpetre", "danogles", "waneck"],
   "dependencies": {
     "hxnodejs": ""
