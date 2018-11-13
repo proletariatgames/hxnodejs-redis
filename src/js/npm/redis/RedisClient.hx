@@ -968,17 +968,17 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
 
     score_cast_func a callable used to cast the score return value
    **/
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, limit:ZLimit, offset:Int, count:Int,
         callback:Callback<Array<RedisString>>):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int,
         callback:Callback<Array<Dynamic>>):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores,
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, withScores:ZWithScores,
         callback:Callback<Array<Dynamic>>):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, callback:Callback<Array<RedisString>>):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
-  @:overload(function (name:ZSetKey, min:ZFloat, max:ZFloat, withScores:ZWithScores):TReturn {})
-  function zrevrangebyscore(name:ZSetKey, min:ZFloat, max:ZFloat):TReturn;
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, callback:Callback<Array<RedisString>>):TReturn {})
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, limit:ZLimit, offset:Int, count:Int):TReturn {})
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, withScores:ZWithScores, limit:ZLimit, offset:Int, count:Int ):TReturn {})
+  @:overload(function (name:ZSetKey, max:ZFloat, min:ZFloat, withScores:ZWithScores):TReturn {})
+  function zrevrangebyscore(name:ZSetKey, max:ZFloat, min:ZFloat):TReturn;
 
   /**
     Returns a 0-based value indicating the descending rank of key in sorted set name
@@ -1134,6 +1134,14 @@ abstract GenericRedisResponse(Dynamic)
 
   @:extern inline public function asInt():Null<Int> {
     if (Std.is(this, Int)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @:extern inline public function asFloat():Null<Float> {
+    if (Std.is(this, Float)) {
       return this;
     } else {
       return null;
