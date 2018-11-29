@@ -165,6 +165,24 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   function unref():Void;
 
   /**
+    Duplicate all current options and return a new redisClient instance. All
+    options passed to the duplicate function are going to replace the
+    original option. If you pass a callback, duplicate is going to wait until
+    the client is ready and returns it in the callback. If an error occurs in
+    the meanwhile, that is going to return an error instead in the callback.
+
+    One example of when to use duplicate() would be to accommodate the
+    connection- blocking redis commands BRPOP, BLPOP, and BRPOPLPUSH. If
+    these commands are used on the same redisClient instance as non-blocking
+    commands, the non-blocking ones may be queued up until after the blocking
+    ones finish.
+  **/
+  @:overload(function(callback:js.Error->RedisClient->Void):RedisClient {})
+  @:overload(function(options:js.npm.Redis.RedisOptions, callback:js.Error->RedisClient->Void):RedisClient {})
+  @:overload(function(options:js.npm.Redis.RedisOptions):RedisClient {})
+  function duplicate():RedisClient;
+
+  /**
     The reply from an HGETALL command will be converted into a JavaScript Object by node_redis. That way you can
     interact with the responses using JavaScript syntax.
    **/
@@ -200,6 +218,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Unsubscribe to a pattern
    **/
+  @:overload(function(channels:Rest<RedisString>):Void {})
+  @:overload(function(channels:Array<RedisString>):Void {})
   function unsubscribe():Void;
 
   @:overload(function(channel:RedisString, message:RedisString, callback:Callback<Int>):TReturn {})
@@ -250,38 +270,39 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   @:overload(function (callback:Callback<RedisString>):TReturn {})
   function bgsave():TReturn;
 
-  // TODO: see how timeout is handled
-  // /**
-  //   LPOP a value off of the first non-empty list named in the keys list.
-  //
-  //   If none of the lists in keys has a value to LPOP, then block for timeout seconds, or until a value gets pushed on to one of the lists.
-  //
-  //   If timeout is 0, then block indefinitely.
-  //  **/
-  // @:overload(function (keys:Array<RedisString>):TReturn {})
-  // @:overload(function (keys:Array<RedisString>, timeout:Int):TReturn {})
-  // @:overload(function (keys:Array<RedisString>, timeout:Int, callback:Callback<RedisString>):TReturn {})
-  // function blpop(keys:Rest<RedisString>):TReturn;
+  /**
+    LPOP a value off of the first non-empty list named in the keys list.
 
-  // TODO: see how timeout is handled
-  // /**
-  //   RPOP a value off of the first non-empty list named in the keys list.
-  //
-  //   If none of the lists in keys has a value to LPOP, then block for timeout seconds, or until a value gets pushed on to
-  //   one of the lists.
-  //
-  //   If timeout is 0, then block indefinitely.
-  //  **/
-  // function brpop(keys:Rest<RedisString>, timeout=0):TReturn;
+    If none of the lists in keys has a value to LPOP, then block for timeout seconds, or until a value gets pushed on to one of the lists.
 
-  // TODO: see how timeout is handled
-  // /**
-  //   Pop a value off the tail of src, push it on the head of dst and then return it.
-  //
-  //   This command blocks until a value is in src or until timeout seconds elapse, whichever is first. A timeout value of
-  //   0 blocks forever.
-  //  **/
-  // function brpoplpush(src, dst, timeout=0):TReturn;
+    If timeout is 0, then block indefinitely.
+   **/
+  @:overload(function (data:Array<Dynamic>):TReturn {})
+  @:overload(function (data:Array<Dynamic>, callback:Callback<Null<Array<RedisString>>>):TReturn {})
+  @:overload(function (key:ListKey, timeoutSeconds:Int, callback:Callback<Null<Array<RedisString>>>):TReturn {})
+  function blpop(key:ListKey, timeoutSeconds:Int):TReturn;
+
+  /**
+    RPOP a value off of the first non-empty list named in the keys list.
+
+    If none of the lists in keys has a value to LPOP, then block for timeout seconds, or until a value gets pushed on to
+    one of the lists.
+
+    If timeout is 0, then block indefinitely.
+   **/
+  @:overload(function (data:Array<Dynamic>):TReturn {})
+  @:overload(function (data:Array<Dynamic>, callback:Callback<Null<Array<RedisString>>>):TReturn {})
+  @:overload(function (key:ListKey, timeoutSeconds:Int, callback:Callback<Null<Array<RedisString>>>):TReturn {})
+  function brpop(key:ListKey, timeoutSeconds:Int):TReturn;
+
+  /**
+    Pop a value off the tail of src, push it on the head of dst and then return it.
+
+    This command blocks until a value is in src or until timeout seconds elapse, whichever is first. A timeout value of
+    0 blocks forever.
+   **/
+  @:overload(function (src:ListKey, dst:ListKey, timeoutSeconds:Int, callback:Callback<Null<RedisString>>):TReturn {})
+  function brpoplpush(src:ListKey, dst:ListKey, timeoutSeconds:Int):TReturn;
 
   /**
     Returns the number of keys in the current database
@@ -954,7 +975,7 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     withscores indicates to return the scores along with the values The return type is a list of (value, score) pairs
    **/
   @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores,
-        callback:Callback<Array<Dynamic>>):TReturn {})
+        callback:Callback<Array<RedisString>>):TReturn {})
   @:overload(function (name:ZSetKey, start:Int, end:Int, callback:Callback<Array<RedisString>>):TReturn {})
   @:overload(function (name:ZSetKey, start:Int, end:Int, withScores:ZWithScores):TReturn {})
   function zrevrange(name:ZSetKey, start:Int, num:Int):TReturn;
