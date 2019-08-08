@@ -62,7 +62,7 @@ typedef SimpleStringReply = String;
     client will emit error when encountering an error connecting to the Redis server or when any other in node_redis occurs.
     So please attach the error listener to node_redis.
    **/
-  var Error : RedisEvent<js.Error->Void> = "error";
+  var Error : RedisEvent<js.lib.Error->Void> = "error";
 
   /**
     client will emit end when an established Redis server connection has closed.
@@ -177,8 +177,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     commands, the non-blocking ones may be queued up until after the blocking
     ones finish.
   **/
-  @:overload(function(callback:js.Error->RedisClient->Void):RedisClient {})
-  @:overload(function(options:js.npm.Redis.RedisOptions, callback:js.Error->RedisClient->Void):RedisClient {})
+  @:overload(function(callback:js.lib.Error->RedisClient->Void):RedisClient {})
+  @:overload(function(options:js.npm.Redis.RedisOptions, callback:js.lib.Error->RedisClient->Void):RedisClient {})
   @:overload(function(options:js.npm.Redis.RedisOptions):RedisClient {})
   function duplicate():RedisClient;
 
@@ -1271,7 +1271,7 @@ abstract ZFloat(String) to String {
 }
 
 @:jsRequire("redis", "RedisError")
-extern class RedisError extends js.Error {
+extern class RedisError extends js.lib.Error {
   public var code(default, null):ErrorCode;
 }
 @:jsRequire("redis", "ReplyError")
