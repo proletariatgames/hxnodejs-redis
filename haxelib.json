@@ -6,8 +6,8 @@
   "tags": ["nodejs", "hxnodejs", "redis", "db"],
   "description": "Externs for the redis NPM module",
   "releasenote": "Added support to Haxe 4",
-  "version": "2.8.2",
-  "contributors": ["Proletariat", "lpetre", "danogles", "waneck"],
+  "version": "2.8.3",
+  "contributors": ["Proletariat", "ProletariatDev1"],
   "dependencies": {
     "hxnodejs": ""
   }
