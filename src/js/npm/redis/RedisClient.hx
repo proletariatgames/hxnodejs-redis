@@ -5,6 +5,11 @@ import js.npm.redis.Callbacks;
 import haxe.DynamicAccess;
 import haxe.extern.Rest;
 import haxe.Constraints;
+#if haxe4
+import js.lib.Error;
+#else
+import js.Error;
+#end
 
 abstract RedisString(Dynamic) from String from Buffer {
   @:to public function asBuffer():Buffer {
@@ -62,7 +67,7 @@ typedef SimpleStringReply = String;
     client will emit error when encountering an error connecting to the Redis server or when any other in node_redis occurs.
     So please attach the error listener to node_redis.
    **/
-  var Error : RedisEvent<js.lib.Error->Void> = "error";
+  var Error : RedisEvent<Error->Void> = "error";
 
   /**
     client will emit end when an established Redis server connection has closed.
@@ -177,8 +182,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
     commands, the non-blocking ones may be queued up until after the blocking
     ones finish.
   **/
-  @:overload(function(callback:js.lib.Error->RedisClient->Void):RedisClient {})
-  @:overload(function(options:js.npm.Redis.RedisOptions, callback:js.lib.Error->RedisClient->Void):RedisClient {})
+  @:overload(function(callback:Error->RedisClient->Void):RedisClient {})
+  @:overload(function(options:js.npm.Redis.RedisOptions, callback:Error->RedisClient->Void):RedisClient {})
   @:overload(function(options:js.npm.Redis.RedisOptions):RedisClient {})
   function duplicate():RedisClient;
 
@@ -1271,7 +1276,7 @@ abstract ZFloat(String) to String {
 }
 
 @:jsRequire("redis", "RedisError")
-extern class RedisError extends js.lib.Error {
+extern class RedisError extends Error {
   public var code(default, null):ErrorCode;
 }
 @:jsRequire("redis", "ReplyError")

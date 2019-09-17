@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["nodejs", "hxnodejs", "redis", "db"],
   "description": "Externs for the redis NPM module",
-  "releasenote": "Fixed message/pmessage signature to support `return_buffers:true` option",
-  "version": "2.8.1",
+  "releasenote": "Added support to Haxe 4",
+  "version": "2.8.2",
   "contributors": ["Proletariat", "lpetre", "danogles", "waneck"],
   "dependencies": {
     "hxnodejs": ""
