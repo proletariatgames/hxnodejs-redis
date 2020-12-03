@@ -836,6 +836,8 @@ extern class RedisClientBase<TSelf:RedisClientBase<TSelf,TReturn>, TReturn> exte
   /**
     Return a random member of set name
    **/
+  @:overload(function (name:SetKey, count:Int):TReturn {})
+  @:overload(function (name:SetKey, count:Int, callback:Callback<RedisString>):TReturn {})
   @:overload(function (name:SetKey, callback:Callback<RedisString>):TReturn {})
   function srandmember(name:SetKey):TReturn;
 
